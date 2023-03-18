@@ -1,2 +1,2 @@
-from .comparesession import Session
-from comparefiles import *
+from . comparesession import Session
+from . comparefiles import *
