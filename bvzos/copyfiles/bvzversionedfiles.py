@@ -72,7 +72,7 @@ from . copydescriptor import Copydescriptor
 def verified_copy_file(src,
                        dst):
     """
-    Given a source file and a destination, copies the file, and then checksum's both files to ensure that the copy
+    Given a source file and a destination, copies the file, and then checksum's both files to ensure that the copyfiles
     matches the source. Raises an error if the copied file's md5 checksum does not match the source file's md5 checksum.
 
     :param src:
@@ -91,7 +91,7 @@ def verified_copy_file(src,
     shutil.copy(src, dst)
 
     if not files_are_identical(src, dst):
-        msg = "Verification of copy failed (md5 checksums to not match): "
+        msg = "Verification of copyfiles failed (md5 checksums to not match): "
         raise IOError(msg + src + " --> " + dst)
 
 
@@ -107,9 +107,9 @@ def copy_and_add_ver_num(source_p,
     overwrite. Returns a full path to the file that was copied.
 
     :param source_p:
-            The full path to the file to copy.
+            The full path to the file to copyfiles.
     :param dest_p:
-            The full path to the destination file (path plus name to copy to).
+            The full path to the destination file (path plus name to copyfiles to).
     :param ver_prefix:
             The prefix to put onto the version number. For example, if the prefix is "v", then the version number will
             be represented as "v####". Defaults to "v".
@@ -117,7 +117,7 @@ def copy_and_add_ver_num(source_p,
             How much padding to use for the version numbers. For example, 4 would lead to versions like: v0001 whereas 3
             would lead to versions like: v001. Defaults to 4.
     :param do_verified_copy:
-            If True, then a verified copy will be performed. Defaults to False.
+            If True, then a verified copyfiles will be performed. Defaults to False.
 
     :return:
             A full path to the file that was copied.
@@ -260,7 +260,7 @@ def copy_files_deduplicated(copydescriptors,
                             num_digits=4,
                             do_verified_copy=False):
     """
-    Given a list of copydescriptor objects, copy the files they represent into the data directory and make a symlink in
+    Given a list of copydescriptor objects, copyfiles the files they represent into the data directory and make a symlink in
     dest_p that points to these files. Does de-duplication so that if more than one file (regardless of when copied or
     name) contains the same data, it will only be stored in data_d once. If the copydescriptor for a file has
     link_in_place set to True, then that file will not be copied to data_d, and the symlink in dest_p will insetad point
@@ -320,7 +320,7 @@ def copy_files_deduplicated(copydescriptors,
             How much padding to use for the version numbers. For example, 4 would lead to versions like: v0001 whereas 3
             would lead to versions like: v001. Defaults to 4.
     :param do_verified_copy:
-            If True, then a verified copy will be performed. Defaults to False.
+            If True, then a verified copyfiles will be performed. Defaults to False.
 
     :return:
             A dictionary where the key is the source file that was copied, and the value is a string representing the
@@ -382,7 +382,7 @@ def copy_file_deduplicated(source_p,
                            num_digits=4,
                            do_verified_copy=False):
     """
-    Given a full path to a source file, copy that file into the data directory and make a symlink in dest_p that points
+    Given a full path to a source file, copyfiles that file into the data directory and make a symlink in dest_p that points
     to this file. Does de-duplication so that if more than one file contains the same data (regardless of name or any
     other file stats), it will only be stored in data_d once. See copy_files_deduplicated for more details.
 
@@ -398,7 +398,7 @@ def copy_file_deduplicated(source_p,
             A dictionary that lists the contents of the data directory keyed by file size. The key is the size of the
             file, and the value is a list of files in the data directory that match this size.
     :param cached_md5:
-            A dictionary that will be used to store cached md5 hashes to speed up the copy operation in cases where this
+            A dictionary that will be used to store cached md5 hashes to speed up the copyfiles operation in cases where this
             function is called more than once. This may be an empty dictionary. It is populated by repeated runs of this
             function.
     :param ver_prefix:
@@ -410,7 +410,7 @@ def copy_file_deduplicated(source_p,
             How much padding to use for the version numbers. For example, 4 would lead to versions like: v0001 whereas 3
             would lead to versions like: v001. Defaults to 4.
     :param do_verified_copy:
-            If True, then a verified copy will be performed. Defaults to False.
+            If True, then a verified copyfiles will be performed. Defaults to False.
 
     :return:
             The string representing the path to the actual de-duplicated file in data_d.
@@ -454,7 +454,7 @@ def copy_file_deduplicated(source_p,
                 matched_p = possible_match_p
                 break
 
-    # If we did not find a matching file, then copy the file to the data_d dir (this will add a version number that
+    # If we did not find a matching file, then copyfiles the file to the data_d dir (this will add a version number that
     # ensures that we do not overwrite any previous versions of files with the same name).
     if matched_p is None:
         dest_n = os.path.split(dest_p)[1]
