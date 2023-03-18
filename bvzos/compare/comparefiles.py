@@ -11,7 +11,7 @@ import os.path
 def md5_hash_generator(file_p):
     """
     Generator that reads in a file and creates the md5 hash of that file. Yields the results as it progresses so that
-    the checksum can be inspected as the file is being inspected.
+    the checksum can be evaluated as the file is being inspected, and not just at the end.
 
     :param file_p:
         The file to hash
