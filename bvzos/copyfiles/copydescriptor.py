@@ -1,5 +1,4 @@
 import os.path
-from dataclasses import dataclass
 
 """
 A basic class to hold the info about a single file that is to be copied using deduplication.
@@ -27,4 +26,4 @@ class Copydescriptor:
 
         self.source_p = source_p
         self.dest_relative_p = dest_relative_p
-        self.link_in_place=link_in_place
+        self.link_in_place = link_in_place
