@@ -1,4 +1,5 @@
 import os
+import stat
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -61,3 +62,75 @@ def is_root(path_p):
 
     root = os.path.abspath(os.sep)
     return path_p == root
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+def get_root():
+    """
+    Returns the root of the file system. Only works on Unix-like systems at the moment.
+
+    :return:
+        The root of the filesystem.
+    """
+
+    return os.sep
+
+
+# ------------------------------------------------------------------------------------------------------------------
+
+def is_hidden(file_p):
+    """
+    Returns whether the given file path is a hidden file. On Unix-type systems this is simply if the file name
+    begins with a dot. On Windows there is some other mechanism at play that I don't feel like dealing with right
+    now. But this method exists so that I can add Windows compatibility in the future.
+
+    :param file_p:
+        The path to the file that we want to determine whether it is hidden or not.
+
+    :return:
+        True if the file is hidden. False otherwise.
+    """
+
+    assert type(file_p) is str
+
+    return os.path.split(file_p)[1][0] == "."
+
+
+# ------------------------------------------------------------------------------------------------------------------
+def has_file_read_permissions(st_mode,
+                              file_uid,
+                              file_gid,
+                              uid,
+                              gid):
+    """
+    Returns true if the uid and gid passed has read permissions for the passed file's st_mode, file_uid, and
+    file_gid.
+
+    :param st_mode:
+        The results of an os.stat.st_mode on the file in question.
+    :param file_uid:
+        The user id of the file in question.
+    :param file_gid:
+        The group id of the file in question.
+    :param uid:
+        The user id of the user who we are testing against.
+    :param gid:
+        The group id of the user who we are testing against.
+
+    :return:
+        True if the user has read permissions.
+    """
+
+    assert type(st_mode) is int
+    assert type(file_uid) is int
+    assert type(file_gid) is int
+    assert type(uid) is int
+    assert type(gid) is int
+
+    if file_uid == uid:
+        return bool(stat.S_IRUSR & st_mode)
+
+    if file_gid == gid:
+        return bool(stat.S_IRGRP & st_mode)
+
+    return bool(stat.S_IROTH & st_mode)

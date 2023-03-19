@@ -2,6 +2,7 @@
 
 import os.path
 
+import bvzos.fs.path
 from bvzos.scanfs import Options
 from bvzos.scanfs import ScanFiles
 
@@ -38,7 +39,8 @@ class Session(object):
         """
         :param query_items:
             A list of query directories or files (must include the full path). Also accepts: a set, a tuple, as well as
-            a single string containing a single path.
+            a single string containing a single path. May also be set to None, but must be assigned actual values before
+            the query scan is run.
         :param canonical_dir:
             The full canonical directory path.
         :param query_skip_sub_dir:
@@ -96,9 +98,10 @@ class Session(object):
             an integer value of 10.
         """
 
-        assert type(query_items) in [list, set, tuple, str]
-        for query_item in query_items:
-            assert(os.path.isabs(query_item))
+        assert query_items is None or type(query_items) in [list, set, tuple, str]
+        if query_items is not None:
+            for query_item in query_items:
+                assert(os.path.isabs(query_item))
         assert type(canonical_dir) is str
         assert(os.path.isabs(canonical_dir))
         assert type(query_skip_sub_dir) is bool
@@ -145,7 +148,7 @@ class Session(object):
         self.query_items = self._parameter_to_list(query_items)
         self.canonical_dir = canonical_dir
 
-        self.actual_matches = dict()
+        self.duplicates = dict()
         self.unique = set()
         self.skipped_self = set()
 
@@ -260,6 +263,36 @@ class Session(object):
             yield file_count
 
     # ------------------------------------------------------------------------------------------------------------------
+    def append_to_query_scan(self,
+                             file_p):
+        """
+        Appends a new file to an existing query scan.
+
+        :param file_p:
+            The full path to the file that is to be added to the scan.
+
+        :return:
+            Nothing.
+        """
+
+        self.query_scan.append_file(file_p=file_p, root_p=bvzos.fs.path.get_root())
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def append_to_canonical_scan(self,
+                                 file_p):
+        """
+        Appends a new file to an existing canonical scan.
+
+        :param file_p:
+            The full path to the file that is to be added to the scan.
+
+        :return:
+            Nothing.
+        """
+
+        self.canonical_scan.append_file(file_p=file_p, root_p=bvzos.fs.path.get_root())
+
+    # ------------------------------------------------------------------------------------------------------------------
     def _add_unique(self,
                     file_p):
         """
@@ -291,9 +324,9 @@ class Session(object):
         """
 
         try:
-            self.actual_matches[canonical_p].append(query_p)
+            self.duplicates[canonical_p].append(query_p)
         except KeyError:
-            self.actual_matches[canonical_p] = [query_p]
+            self.duplicates[canonical_p] = [query_p]
 
     # ------------------------------------------------------------------------------------------------------------------
     def do_compare(self,
@@ -390,7 +423,7 @@ class Session(object):
                     self.skipped_self.add(file_p)
                     continue
 
-                if skip_checksum:
+                if skip_checksum:  # If no checksum, then a possible match is essentially a real match.
                     match = True
                     self._append_match(file_p, possible_match_p)
                     continue
@@ -401,9 +434,9 @@ class Session(object):
                     self.pre_computed_checksum_count += 1
 
                 try:
-                    checksum = comparefiles.compare(file_a_p=file_p,
-                                                    file_b_p=possible_match_p,
-                                                    file_b_checksum=possible_match_checksum)
+                    checksum = comparefiles.compare_files(file_a_p=file_p,
+                                                          file_b_p=possible_match_p,
+                                                          file_b_checksum=possible_match_checksum)
                 except AssertionError:
                     if not os.path.exists(file_p):
                         self.source_error_files.add(file_p)
@@ -411,7 +444,7 @@ class Session(object):
                         self.possible_match_error_files.add(possible_match_p)
                     continue
 
-                if checksum:
+                if checksum:  # If a checksum was returned, then the two files match.
                     match = True
                     self._store_checksum_in_cache(file_p=possible_match_p, checksum=checksum)
                     self._append_match(file_p, possible_match_p)

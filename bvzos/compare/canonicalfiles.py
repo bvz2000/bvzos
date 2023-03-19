@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
-# from . scanfiles import ScanFiles
-from bvzscanfilesystem.scanfiles import ScanFiles
+from bvzos.scanfs import ScanFiles
 
 
 class CanonicalFiles(ScanFiles):
@@ -52,13 +51,13 @@ class CanonicalFiles(ScanFiles):
     # ------------------------------------------------------------------------------------------------------------------
     def _append_to_scan(self,
                         file_path,
-                        metadata):
+                        file_metadata):
         """
         Appends a new file to the scan dictionaries.
 
         :param file_path:
             The path to the file to add
-        :param metadata:
+        :param file_metadata:
             The metadata for this file.
 
         :return:
@@ -66,31 +65,31 @@ class CanonicalFiles(ScanFiles):
         """
 
         self._append_to_dict(by_dict=self.by_size,
-                             key=metadata["size"],
+                             key=file_metadata["size"],
                              file_path=file_path)
 
         self._append_to_dict(by_dict=self.by_name,
-                             key=metadata["name"],
+                             key=file_metadata["name"],
                              file_path=file_path)
 
         self._append_to_dict(by_dict=self.by_type,
-                             key=metadata["file_type"],
+                             key=file_metadata["file_type"],
                              file_path=file_path)
 
         self._append_to_dict(by_dict=self.by_parent,
-                             key=metadata["parent"],
+                             key=file_metadata["parent"],
                              file_path=file_path)
 
         self._append_to_dict(by_dict=self.by_rel_path,
-                             key=metadata["rel_path"],
+                             key=file_metadata["rel_path"],
                              file_path=file_path)
 
         self._append_to_dict(by_dict=self.by_ctime,
-                             key=metadata["ctime"],
+                             key=file_metadata["ctime"],
                              file_path=file_path)
 
         self._append_to_dict(by_dict=self.by_mtime,
-                             key=metadata["mtime"],
+                             key=file_metadata["mtime"],
                              file_path=file_path)
 
     # ------------------------------------------------------------------------------------------------------------------

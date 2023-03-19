@@ -1,6 +1,8 @@
 import os
 import re
 
+from . import path
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 def count_files_recursively(dir_d):
@@ -66,52 +68,6 @@ def invert_dir_list(parent_d,
                     output.append(item_n)
 
     return output
-#
-#
-# # ----------------------------------------------------------------------------------------------------------------------
-# def convert_unix_path_to_os_path(path):
-#     """
-#     Given a path string (in a unix-like path format), converts it into an OS appropriate path format. Note, it does not
-#     check to see whether this path exists. It merely re-formats the string into the OS specific format.
-#
-#     :param path:
-#             The path string to be reformatted.
-#
-#     :return:
-#             An OS appropriate path string.
-#     """
-#
-#     assert type(path) is str
-#
-#     return os.path.join(*path.lstrip("/").split("/"))
-#
-#
-# # ----------------------------------------------------------------------------------------------------------------------
-# # TODO: Make windows friendly
-# def symlinks_to_real_paths(symlinks_p):
-#     """
-#     Given a list of symbolic link files, return a list of their real paths. Only
-#     works on Unix-like systems for the moment.
-#
-#     :param symlinks_p:
-#             A symlink or list of symlinks. If a file in this list is not a symlink, its path will be included unchanged.
-#             If a file in this list does not exist, it will be treated as though it is not a symlink. Accepts either a
-#             path to a symlink or a list of paths.
-#
-#     :return:
-#             A list of the real paths being pointed to by the symlinks.
-#     """
-#
-#     assert type(symlinks_p) is list or type(symlinks_p) is str
-#
-#     if type(symlinks_p) != list:
-#         symlinks_p = list(symlinks_p)
-#
-#     output = list()
-#
-#     for symlink_p in symlinks_p:
-#         output.append(os.path.realpath(symlink_p))
-#     return output
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -149,7 +105,7 @@ def recursively_list_files_in_dirs(source_dirs_d):
 # ----------------------------------------------------------------------------------------------------------------------
 def recursively_list_symlink_targets_in_dirs(source_dirs_d):
     """
-    Recursively list all of the symlink targets of all the files in the directory or directories.
+    Recursively list all the symlink targets of all the files in the directory or directories.
 
     :param source_dirs_d:
                 The directory or list of directories we want to recursively list. Accepts either a string or a list.
@@ -237,22 +193,6 @@ def dir_files_keyed_by_size(path_d):
         file_p = os.path.join(path_d, file_n)
         add_file_to_dict_by_size(file_p, output)
     return output
-#
-#
-# # ----------------------------------------------------------------------------------------------------------------------
-# def is_root(path_p):
-#     """
-#     Returns True if the path given is the root of the filesystem.
-#
-#     :param path_p:
-#             The path we are testing to see if it is the root path.
-#
-#     :return:
-#             True if path_p is the root of the filesystem.
-#     """
-#
-#     root = os.path.abspath(os.sep)
-#     return path_p == root
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -320,7 +260,7 @@ def ancestor_contains_file(path_p,
             return None
 
         # Check to see if we are at the root level (bail if we are)
-        if is_root(os.path.dirname(test_p)):
+        if path.is_root(os.path.dirname(test_p)):
             if already_at_root:
                 return None
             already_at_root = True
@@ -397,7 +337,7 @@ def symlink_source_is_in_dir(link_p,
     if not os.path.islink(link_p):
         raise ValueError(f"{link_p} is not a symlink.")
 
-    source_d, source_n = os.path.split(symlinks_to_real_paths(link_p)[0])
+    source_d, source_n = os.path.split(path.resolve_symlinks(link_p)[0])
 
     if include_subdirs:
         return source_d.startswith(path_d)

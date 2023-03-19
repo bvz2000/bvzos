@@ -78,10 +78,10 @@ def md5_parallel_match(file_a_p,
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-def compare(file_a_p,
-            file_b_p,
-            file_a_checksum=None,
-            file_b_checksum=None):
+def compare_files(file_a_p,
+                  file_b_p,
+                  file_a_checksum=None,
+                  file_b_checksum=None):
     """
     Performs a full md5 checksum compare between two files. If the files match, the md5 hash is returned. If they
     do not match, False is returned. If either file_a_checksum or file_b_checksum are supplied, those will be used in
