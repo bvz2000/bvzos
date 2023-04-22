@@ -90,30 +90,40 @@ def copy_and_add_ver_num(source_p,
 
 # ----------------------------------------------------------------------------------------------------------------------
 def create_copydescriptor(file_p,
-                          relative_p,
-                          link_in_place):
+                          relative_d,
+                          name=None,
+                          link_in_place=False):
     """
     Given a full path to a file, the relative path, the destination directory, and a boolean that describes whether the
     source file should be linked in place, returns a copydescriptor that stores this information.
 
     :param file_p:
         A full path to the file whose copy parameters are being stored in the copydescriptor.
-    :param relative_p:
-        The relative path to the symlink file. See the dir_to_copydescriptors method for more information on this
-        relative path.
+    :param relative_d:
+        The relative path to the symlink file. Must not include the file name. See the dir_to_copydescriptors method for
+        more information on this relative path.
+    :param name:
+        An optional name to give to the symlink. If omitted or None, the name will be derived from the file_p. Defaults
+        to None.
     :param link_in_place:
-        Do not copy the file, but rather have the symlink file point to the original file_p.
+        An optional boolean where, if set to True, the file_p will not be copied, but rather have the symlink file point
+        to the original file_p.
 
     :return:
         A copydescriptor object.
     """
 
     assert type(file_p) is str
-    assert type(relative_p) is str
+    assert type(relative_d) is str
+    assert name is None or type(name) is str
     assert type(link_in_place) is bool
 
+    if name is None:
+        name = os.path.split(file_p)[1]
+
     return Copydescriptor(source_p=file_p,
-                          dest_relative_p=relative_p,
+                          dest_relative_p=relative_d,
+                          name=name,
                           link_in_place=link_in_place)
 
 
@@ -148,7 +158,8 @@ def files_to_copydescriptors(files_p,
 
     for file_p in files_p:
         copydescriptors.append(create_copydescriptor(file_p=file_p,
-                                                     relative_p=os.path.join(relative_d, os.path.split(file_p)[1]),
+                                                     relative_d=relative_d,
+                                                     name=os.path.split(file_p)[1],
                                                      link_in_place=link_in_place))
 
     return copydescriptors
@@ -189,8 +200,10 @@ def dir_to_copydescriptors(dir_d,
         for file_n in files_n:
             file_p = os.path.join(path, file_n)
             dest_relative_p = file_p.split(dir_d)[1]
+            dest_relative_d, symlink_name = os.path.split(dest_relative_p)
             copydescriptors.append(create_copydescriptor(file_p=file_p,
-                                                         relative_p=dest_relative_p,
+                                                         relative_d=dest_relative_d,
+                                                         name=symlink_name,
                                                          link_in_place=link_in_place))
 
     return copydescriptors
@@ -296,7 +309,7 @@ def copy_files_deduplicated(copydescriptors,
 
     for copydescriptor in copydescriptors:
 
-        dest_p = os.path.join(dest_d, copydescriptor.dest_relative_p.lstrip(os.sep))
+        dest_p = os.path.join(copydescriptor.dest_relative_p.rstrip(os.sep), copydescriptor.name.lstrip(os.sep))
 
         if not copydescriptor.link_in_place:
             output[copydescriptor.source_p] = copy_file_deduplicated(source_p=copydescriptor.source_p,

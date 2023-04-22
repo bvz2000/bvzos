@@ -71,7 +71,7 @@ def invert_dir_list(parent_d,
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-def recursively_list_files_in_dirs(source_dirs_d):
+def list_files_recursively(source_dirs_d):
     """
     Recursively list all the files in the directory or directories
 
@@ -103,7 +103,7 @@ def recursively_list_files_in_dirs(source_dirs_d):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-def recursively_list_symlink_targets_in_dirs(source_dirs_d):
+def list_symlink_targets_recursively(source_dirs_d):
     """
     Recursively list all the symlink targets of all the files in the directory or directories.
 
@@ -127,7 +127,7 @@ def recursively_list_symlink_targets_in_dirs(source_dirs_d):
 
     output = list()
 
-    files_p = recursively_list_files_in_dirs(source_dirs_d)
+    files_p = list_files_recursively(source_dirs_d)
     for file_p in files_p:
         if os.path.islink(file_p) and os.path.exists(file_p):
             output.append(os.readlink(file_p))
@@ -320,13 +320,13 @@ def symlink_source_is_in_dir(link_p,
     :param link_p:
             The full path to the symlink to be evaluated.
     :param path_d:
-            The directory we are checking to see if the symlink source is inside of.
+            The directory we are checking to see if the symlink source is inside it.
     :param include_subdirs:
             Whether we should also consider being in a subdirectory of the above directory as "being in" this
             directory. Defaults to True
 
     :return:
-            True if the source file of the symlink is in the passed directory (or any subdirectory if include_subdirs is
+            True if the source file of the symlink is in the path_d directory (or any subdirectory if include_subdirs is
             True). False otherwise.
     """
 
